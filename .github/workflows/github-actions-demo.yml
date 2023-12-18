@@ -1,17 +1,28 @@
-name: Greeting from Mona
-on: push
+name: GitHub Actions Demo
+run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
+on: [push]
 
 jobs:
-  my-job:
-    name: My Job
-    runs-on: ubuntu-18.04
+  jobs_buildenv:
+    runs-on: ubuntu-20.04
     steps:
-    - name: Print a greeting
-      env:
-        MY_VAR: Hi there! My name is
-        FIRST_NAME: Mona
-        MIDDLE_NAME: The
-        LAST_NAME: Octocat
-      run: |
-        echo $MY_VAR $FIRST_NAME $MIDDLE_NAME $LAST_NAME.
-        lsb_release -a
+      - name: Check out repository code
+        uses: actions/checkout@v4
+      - run: hack/build_info.sh install_apt
+      - run: pwd
+      - run: ls -al /usr/bin/ | grep aarch64
+      - run: aarch64-linux-gnu-gcc --version
+
+  jobs_config:
+    runs-on: ubuntu-20.04
+    needs: jobs_buildenv
+    steps:
+      - run: pwd
+      - run: aarch64-linux-gnu-gcc --version
+  
+  jobs_build:
+    runs-on: ubuntu-20.04
+    needs: jobs_config
+    steps:
+      - run: pwd
+      - run: aarch64-linux-gnu-gcc --version
